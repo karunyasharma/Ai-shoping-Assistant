@@ -9,26 +9,40 @@
 body {
   margin:0;
   font-family: 'Segoe UI', sans-serif;
-  background:linear-gradient(135deg,#141e30,#243b55);
+  background:#0f172a;
   color:white;
-}
-
-/* HEADER */
-.header {
-  text-align:center;
-  padding:18px;
-  font-size:22px;
-  font-weight:bold;
-  background:rgba(0,0,0,0.3);
 }
 
 /* HERO */
 .hero {
+  background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),
+  url('https://images.unsplash.com/photo-1519389950473-47ba0277781c');
+  background-size:cover;
+  padding:100px 20px;
   text-align:center;
-  padding:60px 20px;
 }
-.hero h1 { font-size:36px; }
-.hero p { opacity:0.7; }
+.hero h1 { font-size:40px; }
+.hero p { opacity:0.8; }
+
+/* CARDS */
+.cards {
+  display:flex;
+  flex-wrap:wrap;
+  gap:20px;
+  justify-content:center;
+  padding:40px;
+}
+.card {
+  width:260px;
+  background:white;
+  color:black;
+  border-radius:10px;
+  overflow:hidden;
+  transition:0.3s;
+}
+.card:hover { transform:scale(1.05); }
+.card img { width:100%; }
+.card div { padding:10px; }
 
 /* CHAT BUTTON */
 .chat-btn {
@@ -37,7 +51,7 @@ body {
   right:20px;
   width:65px;
   height:65px;
-  background:linear-gradient(45deg,#00c6ff,#0072ff);
+  background:#0072ff;
   border-radius:50%;
   display:flex;
   justify-content:center;
@@ -52,37 +66,27 @@ body {
   bottom:100px;
   right:20px;
   width:360px;
-  height:520px;
-  background:rgba(255,255,255,0.08);
-  backdrop-filter:blur(12px);
-  border-radius:15px;
+  height:500px;
+  background:rgba(255,255,255,0.1);
+  backdrop-filter:blur(10px);
   display:none;
   flex-direction:column;
 }
 
-/* CHAT BODY */
+/* CHAT */
 .chat-body {
   flex:1;
   overflow-y:auto;
   padding:10px;
-  display:flex;
-  flex-direction:column;
 }
-
-/* MESSAGES */
 .message {
   margin:6px 0;
   padding:10px;
-  border-radius:12px;
+  border-radius:10px;
   max-width:75%;
 }
-.user {
-  background:#0072ff;
-  align-self:flex-end;
-}
-.bot {
-  background:#333;
-}
+.user { background:#0072ff; margin-left:auto; }
+.bot { background:#333; }
 
 /* FOOTER */
 .chat-footer {
@@ -90,27 +94,49 @@ body {
 }
 .chat-footer input {
   flex:1;
-  padding:12px;
+  padding:10px;
   border:none;
-  outline:none;
 }
 .chat-footer button {
-  padding:12px;
+  padding:10px;
   border:none;
   background:#0072ff;
   color:white;
-  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">🎓 AI Course Assistant</div>
-
 <div class="hero">
-  <h1>Find the Best Courses for You</h1>
-  <p>Ask anything and get AI recommendations</p>
+  <h1>🎓 AI Course Assistant</h1>
+  <p>Find the best courses with AI recommendations</p>
+</div>
+
+<div class="cards">
+  <div class="card">
+    <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c">
+    <div>
+      <h3>Machine Learning</h3>
+      <p>⭐ 4.8 | ₹999</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475">
+    <div>
+      <h3>Web Development</h3>
+      <p>⭐ 4.7 | ₹799</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <img src="https://images.unsplash.com/photo-1526378722484-bd91ca387e72">
+    <div>
+      <h3>Data Science</h3>
+      <p>⭐ 4.9 | ₹1199</p>
+    </div>
+  </div>
 </div>
 
 <div class="chat-btn" onclick="toggleChat()">💬</div>
@@ -126,22 +152,19 @@ body {
 
 <script>
 
-// YOUR FLOWISE FUNCTION
+// FLOWISE API FUNCTION
 async function query(data) {
     const response = await fetch(
         "https://cloud.flowiseai.com/api/v1/prediction/62831658-e1b5-4410-a99f-8b4a885d365b",
         {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data)
         }
     );
     return response.json();
 }
 
-// UI FUNCTIONS
 function toggleChat(){
   const box=document.getElementById("chatBox");
   box.style.display = box.style.display==="flex" ? "none" : "flex";
@@ -173,19 +196,16 @@ async function sendMessage(){
     const response = await query({ question: text });
 
     loading.remove();
+    add("bot", response.text || "No response");
 
-    add("bot", response.text || "No response from AI");
-
-  }catch(e){
-    loading.innerText="Error connecting to server";
+  }catch{
+    loading.innerText="Error connecting";
   }
 }
 
-// ENTER KEY SUPPORT
 document.getElementById("input").addEventListener("keypress",e=>{
   if(e.key==="Enter") sendMessage();
 });
-
 </script>
 
 </body>
