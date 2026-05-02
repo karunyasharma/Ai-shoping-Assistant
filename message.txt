@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Course Assistant</title>
+
+<style>
+body {
+  margin:0;
+  font-family:system-ui;
+  background:linear-gradient(135deg,#1e3c72,#2a5298);
+  color:white;
+}
+
+/* HERO */
+.hero {
+  background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),
+  url('https://images.unsplash.com/photo-1519389950473-47ba0277781c');
+  background-size:cover;
+  padding:100px 20px;
+  text-align:center;
+}
+.hero h1 {font-size:42px;}
+.hero p {opacity:0.8;}
+
+/* COURSE CARDS */
+.cards {
+  display:flex;
+  flex-wrap:wrap;
+  gap:20px;
+  justify-content:center;
+  padding:40px;
+}
+.card {
+  width:260px;
+  background:white;
+  color:black;
+  border-radius:10px;
+  overflow:hidden;
+}
+.card img {width:100%;}
+.card div {padding:10px;}
+
+/* STATS */
+.stats {
+  text-align:center;
+  padding:40px;
+  background:#111;
+}
+
+/* CHAT BUTTON */
+.chat-btn {
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  width:60px;
+  height:60px;
+  background:#0072ff;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  font-size:24px;
+}
+
+/* CHAT BOX */
+.chat-box {
+  position:fixed;
+  bottom:90px;
+  right:20px;
+  width:350px;
+  height:500px;
+  background:rgba(255,255,255,0.1);
+  backdrop-filter:blur(10px);
+  display:none;
+  flex-direction:column;
+}
+
+/* CHAT BODY */
+.chat-body {
+  flex:1;
+  overflow-y:auto;
+  padding:10px;
+}
+
+/* MESSAGES */
+.message {
+  margin:6px 0;
+  padding:8px;
+  border-radius:8px;
+  max-width:75%;
+}
+.user {
+  background:#00c6ff;
+  align-self:flex-end;
+  margin-left:auto;
+}
+.bot {
+  background:#333;
+}
+
+/* FOOTER */
+.chat-footer {
+  display:flex;
+}
+.chat-footer input {
+  flex:1;
+  padding:10px;
+  border:none;
+  outline:none;
+}
+.chat-footer button {
+  padding:10px;
+  border:none;
+  background:#0072ff;
+  color:white;
+  cursor:pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- HERO -->
+
+<div class="hero">
+  <h1>🎓 AI Course Assistant</h1>
+  <p>Find the best courses instantly with AI</p>
+</div>
+
+<!-- COURSE CARDS -->
+
+<div class="cards">
+  <div class="card">
+    <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c">
+    <div>
+      <h3>Machine Learning</h3>
+      <p>⭐ 4.8 | ₹999</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475">
+    <div>
+      <h3>Web Development</h3>
+      <p>⭐ 4.7 | ₹799</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <img src="https://images.unsplash.com/photo-1526378722484-bd91ca387e72">
+    <div>
+      <h3>Data Science</h3>
+      <p>⭐ 4.9 | ₹1199</p>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+
+<div class="stats">
+  <h2>Trusted by Learners</h2>
+  <p>👥 10,000+ Users</p>
+  <p>📚 500+ Courses Recommended</p>
+  <p>⚡ Instant AI Guidance</p>
+</div>
+
+<!-- CHAT BUTTON -->
+
+<div class="chat-btn" onclick="toggleChat()">💬</div>
+
+<!-- CHAT BOX -->
+
+<div class="chat-box" id="chatBox">
+  <div class="chat-body" id="chat"></div>
+
+  <div class="chat-footer">
+    <input id="input" placeholder="Ask something..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+const API = "YOUR_FLOWISE_API_URL";
+
+function toggleChat(){
+  const box=document.getElementById("chatBox");
+  box.style.display=box.style.display==="flex"?"none":"flex";
+}
+
+function add(role,text){
+  const chat=document.getElementById("chat");
+  const div=document.createElement("div");
+  div.className="message "+role;
+  div.innerText=text;
+  chat.appendChild(div);
+  chat.scrollTop=chat.scrollHeight;
+}
+
+async function sendMessage(){
+  const input=document.getElementById("input");
+  const text=input.value;
+  if(!text) return;
+
+  add("user",text);
+  input.value="";
+
+  add("bot","Typing...");
+
+  try{
+    const res=await fetch(API,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({question:text})
+    });
+
+    const data=await res.json();
+    document.getElementById("chat").lastChild.remove();
+    add("bot",data.text);
+
+  }catch{
+    add("bot","Error connecting to server");
+  }
+}
+
+document.getElementById("input").addEventListener("keypress",e=>{
+  if(e.key==="Enter") sendMessage();
+});
+</script>
+
+</body>
+</html>
